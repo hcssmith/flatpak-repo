@@ -1,0 +1,13 @@
+name: tree-sitter-cmake
+buildsystem: cmake-ninja
+config-opts:
+  - -DPARSERLANG=cmake
+sources:
+  - type: git
+    url: https://github.com/uyha/tree-sitter-cmake.git
+    tag: v0.7.5
+    disable-submodules: true
+    disable-lfs: true
+  - type: file
+    path: patches/TreesitterParserCMakeLists.txt
+    dest-filename: CMakeLists.txt

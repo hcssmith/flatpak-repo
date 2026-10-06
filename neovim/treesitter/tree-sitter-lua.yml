@@ -1,0 +1,13 @@
+name: tree-sitter-lua
+buildsystem: cmake-ninja
+config-opts:
+  - -DPARSERLANG=lua
+sources:
+  - type: git
+    url: https://github.com/tree-sitter-grammars/tree-sitter-lua.git
+    tag: v0.5.0
+    disable-submodules: true
+    disable-lfs: true
+  - type: file
+    path: patches/TreesitterParserCMakeLists.txt
+    dest-filename: CMakeLists.txt

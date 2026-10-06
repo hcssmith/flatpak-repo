@@ -1,0 +1,14 @@
+name: tree-sitter-postgres
+buildsystem: cmake-ninja
+sources:
+  # The parser sources in this repo are git-lfs-tracked; flatpak-builder runs
+  # `git lfs checkout` on git sources, so they resolve to real files (a plain
+  # tarball would only contain LFS pointer stubs). Builds both the postgres
+  # and plpgsql parsers.
+  - type: git
+    url: https://github.com/gmr/tree-sitter-postgres.git
+    tag: v1.2.4
+    commit: 9b27ba5c8700f9bf808221a0f6d17fe6515da787
+  - type: file
+    path: patches/PostgresParserCMakeLists.txt
+    dest-filename: CMakeLists.txt

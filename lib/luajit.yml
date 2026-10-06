@@ -1,0 +1,11 @@
+name: luajit
+buildsystem: autotools
+no-autogen: true
+build-options:
+  cflags: "-fPIC -funwind-tables"
+make-install-args:
+  - PREFIX=/app
+sources:
+  - type: git
+    url: https://github.com/luajit/luajit.git
+    branch: v2.1

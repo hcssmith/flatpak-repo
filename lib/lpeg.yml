@@ -1,0 +1,15 @@
+name: lpeg
+buildsystem: cmake-ninja
+config-opts:
+  - -DCMAKE_BUILD_TYPE=Release
+  - -DBUILD_SHARED_LIBS=OFF
+  - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+  - -DCMAKE_C_FLAGS=-I/app/include/luajit-2.1
+sources:
+  - type: git
+    url: https://github.com/roberto-ieru/LPeg.git
+    tag: v1.1.0
+  - type: file
+    path: ../patches/lpeg/LpegCMakeLists.txt
+    dest-filename: CMakeLists.txt
+

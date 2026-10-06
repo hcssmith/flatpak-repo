@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.16)
+project(postgres C)
+
+add_compile_options(-w)
+
+# The postgres grammar repo carries two parsers (postgres/ and plpgsql/)
+# with git-lfs-tracked sources.
+file(GLOB pg_sources postgres/src/*.c)
+file(GLOB plpgsql_sources plpgsql/src/*.c)
+
+add_library(postgres MODULE ${pg_sources})
+target_include_directories(postgres PRIVATE postgres/src)
+
+add_library(plpgsql MODULE ${plpgsql_sources})
+target_include_directories(plpgsql PRIVATE plpgsql/src)
+
+set_target_properties(postgres plpgsql PROPERTIES PREFIX "")
+
+install(TARGETS postgres plpgsql LIBRARY DESTINATION lib/nvim/parser)
+
+# vim: set ft=cmake:

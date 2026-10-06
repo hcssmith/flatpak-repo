@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.16)
+project(typescript C)
+
+add_compile_options(-w)
+
+# The typescript grammar repo carries two parsers in subdirectories
+# (typescript/ and tsx/); like the Dockerfile this builds only "typescript".
+file(GLOB ts_sources typescript/src/*.c)
+
+add_library(typescript MODULE ${ts_sources})
+target_include_directories(typescript PRIVATE typescript/src)
+
+set_target_properties(typescript PROPERTIES PREFIX "")
+
+install(TARGETS typescript LIBRARY DESTINATION lib/nvim/parser)
+
+# vim: set ft=cmake:

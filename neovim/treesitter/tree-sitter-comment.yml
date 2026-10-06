@@ -1,0 +1,13 @@
+name: tree-sitter-comment
+buildsystem: cmake-ninja
+config-opts:
+  - -DPARSERLANG=comment
+sources:
+  - type: git
+    url: https://github.com/stsewd/tree-sitter-comment.git
+    tag: v0.3.0
+    disable-submodules: true
+    disable-lfs: true
+  - type: file
+    path: patches/TreesitterParserCMakeLists.txt
+    dest-filename: CMakeLists.txt

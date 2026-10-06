@@ -1,0 +1,13 @@
+name: tree-sitter-regex
+buildsystem: cmake-ninja
+config-opts:
+  - -DPARSERLANG=regex
+sources:
+  # Pinned to the revision nvim-treesitter marks "compatible with queries";
+  # the newest release tag (v1.0.0) lacks node types the queries reference.
+  - type: git
+    url: https://github.com/tree-sitter/tree-sitter-regex.git
+    commit: b2ac15e27fce703d2f37a79ccd94a5c0cbe9720b
+  - type: file
+    path: patches/TreesitterParserCMakeLists.txt
+    dest-filename: CMakeLists.txt

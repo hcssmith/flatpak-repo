@@ -1,0 +1,11 @@
+name: tree-sitter
+buildsystem: cmake-ninja
+builddir: true
+config-opts:
+  - -DCMAKE_BUILD_TYPE=Release
+  - -DBUILD_SHARED_LIBS=OFF
+  - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+sources:
+  - type: git
+    url: https://github.com/tree-sitter/tree-sitter.git
+    tag: v0.26.13

@@ -1,0 +1,13 @@
+name: tree-sitter-yaml
+buildsystem: cmake-ninja
+config-opts:
+  - -DPARSERLANG=yaml
+sources:
+  - type: git
+    url: https://github.com/tree-sitter-grammars/tree-sitter-yaml.git
+    tag: v0.7.2
+    disable-submodules: true
+    disable-lfs: true
+  - type: file
+    path: patches/TreesitterParserCMakeLists.txt
+    dest-filename: CMakeLists.txt

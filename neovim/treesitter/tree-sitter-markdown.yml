@@ -1,0 +1,13 @@
+name: tree-sitter-markdown
+buildsystem: cmake-ninja
+config-opts:
+  - -DPARSERLANG=markdown
+sources:
+  - type: git
+    url: https://github.com/tree-sitter-grammars/tree-sitter-markdown.git
+    tag: v0.5.3
+    disable-submodules: true
+    disable-lfs: true
+  - type: file
+    path: patches/MarkdownParserCMakeLists.txt
+    dest-filename: CMakeLists.txt

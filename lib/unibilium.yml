@@ -1,0 +1,11 @@
+name: unibilium
+buildsystem: cmake-ninja
+config-opts:
+  - -DCMAKE_BUILD_TYPE=Release
+  - -DBUILD_SHARED_LIBS=OFF
+  - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+sources:
+  - type: git
+    url: https://github.com/neovim/unibilium.git
+    tag: v2.1.2
+

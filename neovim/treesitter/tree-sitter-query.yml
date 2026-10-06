@@ -1,0 +1,13 @@
+name: tree-sitter-query
+buildsystem: cmake-ninja
+config-opts:
+  - -DPARSERLANG=query
+sources:
+  - type: git
+    url: https://github.com/tree-sitter-grammars/tree-sitter-query.git
+    tag: v0.8.0
+    disable-submodules: true
+    disable-lfs: true
+  - type: file
+    path: patches/TreesitterParserCMakeLists.txt
+    dest-filename: CMakeLists.txt

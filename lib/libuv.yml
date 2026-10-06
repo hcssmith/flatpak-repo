@@ -1,0 +1,11 @@
+name: libuv
+buildsystem: cmake-ninja
+config-opts:
+  - -DCMAKE_BUILD_TYPE=Release
+  - -DBUILD_TESTING=OFF
+  - -DBUILD_SHARED_LIBS=OFF
+  - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+sources:
+  - type: git
+    url: https://github.com/libuv/libuv.git
+    tag: v1.52.1

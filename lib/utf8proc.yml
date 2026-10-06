@@ -1,0 +1,12 @@
+name: utf8proc
+buildsystem: cmake-ninja
+builddir: true
+config-opts:
+  - -DCMAKE_BUILD_TYPE=Release
+  - -DBUILD_SHARED_LIBS=OFF
+  - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+sources:
+  - type: git
+    url: https://github.com/JuliaStrings/utf8proc.git
+    tag: v2.11.3
+

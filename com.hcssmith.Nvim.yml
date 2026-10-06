@@ -1,0 +1,50 @@
+id: com.hcssmith.Nvim
+runtime: org.freedesktop.Sdk
+runtime-version: "26.08"
+sdk: org.freedesktop.Sdk
+
+command: nvim
+
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --filesystem=home
+
+modules:
+  - lib/luajit.yml
+  - lib/libuv.yml
+  - lib/luv.yml
+  - lib/lpeg.yml
+  - lib/unibilium.yml
+  - lib/utf8proc.yml
+
+  - neovim/treesitter/treesitter.yml
+
+  # tree-sitter parsers
+  - neovim/treesitter/tree-sitter-bash.yml
+  - neovim/treesitter/tree-sitter-c.yml
+  - neovim/treesitter/tree-sitter-cmake.yml
+  - neovim/treesitter/tree-sitter-comment.yml
+  - neovim/treesitter/tree-sitter-cpp.yml
+  - neovim/treesitter/tree-sitter-css.yml
+  - neovim/treesitter/tree-sitter-go.yml
+  - neovim/treesitter/tree-sitter-gomod.yml
+  - neovim/treesitter/tree-sitter-html.yml
+  - neovim/treesitter/tree-sitter-java.yml
+  - neovim/treesitter/tree-sitter-javascript.yml
+  - neovim/treesitter/tree-sitter-json.yml
+  - neovim/treesitter/tree-sitter-lua.yml
+  - neovim/treesitter/tree-sitter-markdown.yml
+  - neovim/treesitter/tree-sitter-postgres.yml
+  - neovim/treesitter/tree-sitter-python.yml
+  - neovim/treesitter/tree-sitter-query.yml
+  - neovim/treesitter/tree-sitter-regex.yml
+  - neovim/treesitter/tree-sitter-rust.yml
+  - neovim/treesitter/tree-sitter-toml.yml
+  - neovim/treesitter/tree-sitter-typescript.yml
+  - neovim/treesitter/tree-sitter-vim.yml
+  - neovim/treesitter/tree-sitter-vimdoc.yml
+  - neovim/treesitter/tree-sitter-yaml.yml
+
+  - neovim/neovim-source.yml

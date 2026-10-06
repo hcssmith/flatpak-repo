@@ -10,5 +10,5 @@ sources:
     tag: v1.2.4
     commit: 9b27ba5c8700f9bf808221a0f6d17fe6515da787
   - type: file
-    path: patches/PostgresParserCMakeLists.txt
+    path: ../../patches/treesitter/PostgresParserCMakeLists.txt
     dest-filename: CMakeLists.txt

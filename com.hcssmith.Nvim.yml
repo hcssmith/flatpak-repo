@@ -2,6 +2,8 @@ id: com.hcssmith.Nvim
 runtime: org.freedesktop.Sdk
 runtime-version: "26.08"
 sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
 
 command: nvim
 

@@ -9,5 +9,5 @@ sources:
     disable-submodules: true
     disable-lfs: true
   - type: file
-    path: patches/TreesitterParserCMakeLists.txt
+    path: ../../patches/treesitter/TreesitterParserCMakeLists.txt
     dest-filename: CMakeLists.txt

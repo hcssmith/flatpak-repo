@@ -10,5 +10,5 @@ sources:
     url: https://github.com/camdencheek/tree-sitter-go-mod.git
     commit: 2e886870578eeba1927a2dc4bd2e2b3f598c5f9a
   - type: file
-    path: patches/TreesitterParserCMakeLists.txt
+    path: ../../patches/treesitter/TreesitterParserCMakeLists.txt
     dest-filename: CMakeLists.txt

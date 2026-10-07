@@ -1,0 +1,9 @@
+name: noice.nvim
+buildsystem: simple
+sources:
+  - type: git
+    url: https://github.com/folke/noice.nvim  
+    branch: main
+build-commands:
+  - mkdir -p /app/share/nvim/site/pack/plugins/start/noice.nvim
+  - cp -a . /app/share/nvim/site/pack/plugins/start/noice.nvim

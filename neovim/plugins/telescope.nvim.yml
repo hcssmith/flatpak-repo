@@ -1,0 +1,9 @@
+name: telescope.nvim
+buildsystem: simple
+sources:
+  - type: git
+    url: https://github.com/nvim-telescope/telescope.nvim.git  
+    branch: master
+build-commands:
+  - mkdir -p /app/share/nvim/site/pack/plugins/start/telescope.nvim
+  - cp -a . /app/share/nvim/site/pack/plugins/start/telescope.nvim

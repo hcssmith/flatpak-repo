@@ -1,0 +1,27 @@
+name: ts-full
+modules:
+  - treesitter/treesitter.yml
+  - treesitter/tree-sitter-bash.yml
+  - treesitter/tree-sitter-c.yml
+  - treesitter/tree-sitter-cmake.yml
+  - treesitter/tree-sitter-comment.yml
+  - treesitter/tree-sitter-cpp.yml
+  - treesitter/tree-sitter-css.yml
+  - treesitter/tree-sitter-go.yml
+  - treesitter/tree-sitter-gomod.yml
+  - treesitter/tree-sitter-html.yml
+  - treesitter/tree-sitter-java.yml
+  - treesitter/tree-sitter-javascript.yml
+  - treesitter/tree-sitter-json.yml
+  - treesitter/tree-sitter-lua.yml
+  - treesitter/tree-sitter-markdown.yml
+  - treesitter/tree-sitter-postgres.yml
+  - treesitter/tree-sitter-python.yml
+  - treesitter/tree-sitter-query.yml
+  - treesitter/tree-sitter-regex.yml
+  - treesitter/tree-sitter-rust.yml
+  - treesitter/tree-sitter-toml.yml
+  - treesitter/tree-sitter-typescript.yml
+  - treesitter/tree-sitter-vim.yml
+  - treesitter/tree-sitter-vimdoc.yml
+  - treesitter/tree-sitter-yaml.yml

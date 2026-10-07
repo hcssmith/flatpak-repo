@@ -1,0 +1,8 @@
+name: nvim-build-deps
+modules:
+  - ../lib/luajit.yml
+  - ../lib/libuv.yml
+  - ../lib/luv.yml
+  - ../lib/lpeg.yml
+  - ../lib/unibilium.yml
+  - ../lib/utf8proc.yml

@@ -1,0 +1,10 @@
+name: neovim-config
+modules:
+  - name: nvim-lua-config
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/etc/nvim
+      - cp -r . /app/etc/nvim
+    sources:
+      - type: dir
+        path: ./config

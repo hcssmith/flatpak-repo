@@ -16,5 +16,5 @@ for m in $(mount | grep -oP "$PWD/\.flatpak-builder/rofiles/rofiles-\S+" || true
 done
 rm -rf .flatpak-builder/rofiles
 
-exec flatpak run org.flatpak.Builder  --user --install --force-clean --disable-rofiles-fuse build com.hcssmith.Nvim.yml "$@"
+exec flatpak run org.flatpak.Builder  --user --install-deps-from=flathub --install --force-clean --disable-rofiles-fuse build com.hcssmith.Nvim.yml "$@"
 

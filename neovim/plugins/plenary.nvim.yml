@@ -1,0 +1,9 @@
+name: plenary.nvim
+buildsystem: simple
+sources:
+  - type: git
+    url: https://github.com/nvim-lua/plenary.nvim.git  
+    branch: master
+build-commands:
+  - mkdir -p /app/share/nvim/site/pack/plugins/start/plenary.nvim
+  - cp -a . /app/share/nvim/site/pack/plugins/start/plenary.nvim

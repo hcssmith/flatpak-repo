@@ -1,0 +1,9 @@
+name: nui.nvim
+buildsystem: simple
+sources:
+  - type: git
+    url: https://github.com/muniftanjim/nui.nvim  
+    branch: main
+build-commands:
+  - mkdir -p /app/share/nvim/site/pack/plugins/start/nui.nvim
+  - cp -a . /app/share/nvim/site/pack/plugins/start/nui.nvim

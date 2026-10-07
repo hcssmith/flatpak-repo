@@ -1,0 +1,9 @@
+name: tokyonight.nvim
+buildsystem: simple
+sources:
+  - type: git
+    url: https://github.com/folke/tokyonight.nvim.git 
+    tag: v4.14.1
+build-commands:
+  - mkdir -p /app/share/nvim/site/pack/plugins/start/tokyonight.nvim
+  - cp -a . /app/share/nvim/site/pack/plugins/start/tokyonight.nvim

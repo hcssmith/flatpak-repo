@@ -1,0 +1,9 @@
+name: nvim-web-devicons.nvim
+buildsystem: simple
+sources:
+  - type: git
+    url: https://github.com/nvim-tree/nvim-web-devicons.git   
+    branch: master
+build-commands:
+  - mkdir -p /app/share/nvim/site/pack/plugins/start/nvim-web-devicons.nvim
+  - cp -a . /app/share/nvim/site/pack/plugins/start/nvim-web-devicons.nvim

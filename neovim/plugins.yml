@@ -1,0 +1,9 @@
+name: nvim-plugins
+modules:
+  - plugins/tokyonight.nvim.yml
+  - plugins/plenary.nvim.yml
+  - plugins/telescope.nvim.yml
+  - plugins/nui.nvim.yml
+  - plugins/noice.nvim.yml
+  - plugins/nvim-web-devicons.nvim.yml
+

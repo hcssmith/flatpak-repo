@@ -69,12 +69,26 @@ jobs:
           flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
           flatpak --user install --noninteractive -y flathub org.flatpak.Builder
 
+      # flatpak-builder installs the SDK by shelling out to the flatpak
+      # bundled inside org.flatpak.Builder, which requires a session
+      # D-Bus (the runner has none: "Cannot autolaunch D-Bus without
+      # X11 $DISPLAY"). Builder does not share a host session bus, so run
+      # one at a fixed path and inject the address into its sandbox via
+      # flatpak run --env below (--filesystem=host makes the socket
+      # reachable inside the sandbox).
+      - name: Start session D-Bus
+        run: |
+          sudo apt-get install -y dbus
+          dbus-daemon --session --fork --address="unix:path=$RUNNER_TEMP/session-bus"
+          echo "DBUS_SESSION_BUS_ADDRESS=unix:path=$RUNNER_TEMP/session-bus" >> "$GITHUB_ENV"
+
       # Mirrors buildall.sh (same flags) plus --repo for the export. Debug
       # info is split into .Debug extension refs automatically; they are
       # no-autodownload and tiny (Release builds), so they ship harmlessly.
       - name: Build com.hcssmith.Nvim
         run: |
-          flatpak run org.flatpak.Builder --user --install-deps-from=flathub \
+          flatpak run --env=DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
+            org.flatpak.Builder --user --install-deps-from=flathub \
             --force-clean --disable-rofiles-fuse --repo=repo \
             build/com.hcssmith.Nvim com.hcssmith.Nvim.yml
 
@@ -88,7 +102,8 @@ jobs:
 
       - name: Build com.hcssmith.Neovide
         run: |
-          flatpak run org.flatpak.Builder --user --install-deps-from=flathub \
+          flatpak run --env=DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
+            org.flatpak.Builder --user --install-deps-from=flathub \
             --force-clean --disable-rofiles-fuse --repo=repo \
             build/com.hcssmith.Neovide com.hcssmith.Neovide.yml
 

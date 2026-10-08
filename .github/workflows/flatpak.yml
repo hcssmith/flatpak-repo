@@ -1,0 +1,132 @@
+name: Flatpak repo
+
+# Builds com.hcssmith.Nvim and com.hcssmith.Neovide and publishes the
+# resulting OSTree repo to GitHub Pages, served from
+# https://flatpak.hcssmith.com with the site root as the repo root.
+#
+# One-time repo setup:
+#   * Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
+#     (the configure-pages step below enables this itself via `enablement`)
+#   * Settings -> Pages -> Custom domain: flatpak.hcssmith.com
+#   * DNS: CNAME flatpak.hcssmith.com -> hcssmith.github.io, then enable
+#     "Enforce HTTPS" once the certificate has been issued.
+#
+# The repo is served over HTTPS and left unsigned (no GPG key), so clients
+# install from hcssmith.flatpakrepo with gpg-verify off.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SITE_DOMAIN: flatpak.hcssmith.com
+
+concurrency:
+  group: flatpak-pages
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # The skia build tree inside the neovide module is huge; reclaim what
+      # the stock runner image wastes so / does not fill up.
+      - name: Free disk space
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+
+      # Module-level build cache. flatpak-builder revalidates every cached
+      # module against the manifest, so restoring an older key only rebuilds
+      # what actually changed (skia never rebuilds unless neovide.yml does).
+      - name: Restore build cache
+        uses: actions/cache@v4
+        with:
+          path: .flatpak-builder
+          key: flatpak-builder-${{ hashFiles('**/*.yml', 'patches/**', 'neovim/config/**') }}
+          restore-keys: flatpak-builder-
+
+      # Same builder wrapper buildall.sh uses locally.
+      - name: Install flatpak-builder
+        run: |
+          flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak --user install --noninteractive -y flathub org.flatpak.Builder
+
+      # Mirrors buildall.sh (same flags) plus --repo for the export and
+      # --strip so no .Debug extension refs get published.
+      - name: Build com.hcssmith.Nvim
+        run: |
+          flatpak run org.flatpak.Builder --user --install-deps-from=flathub \
+            --force-clean --disable-rofiles-fuse --strip --repo=repo \
+            build/com.hcssmith.Nvim com.hcssmith.Nvim.yml
+
+      # Neovide layers on the Nvim app (base: com.hcssmith.Nvim,
+      # base-version: master); install it from the repo just exported so
+      # flatpak-builder can resolve the base.
+      - name: Install base app for the Neovide build
+        run: |
+          flatpak --user remote-add --if-not-exists hcssmith-local "$PWD/repo"
+          flatpak --user install --noninteractive --or-update hcssmith-local com.hcssmith.Nvim
+
+      - name: Build com.hcssmith.Neovide
+        run: |
+          flatpak run org.flatpak.Builder --user --install-deps-from=flathub \
+            --force-clean --disable-rofiles-fuse --strip --repo=repo \
+            build/com.hcssmith.Neovide com.hcssmith.Neovide.yml
+
+      - name: Finalize repo metadata and static deltas
+        run: flatpak build-update-repo --generate-static-deltas --title "hcssmith" repo
+
+      # Extra files at the site root; flatpak only ever fetches summary,
+      # objects/ and deltas/, so they do not interfere with the remote.
+      - name: Add site files
+        run: |
+          echo "$SITE_DOMAIN" > repo/CNAME
+          cat > repo/hcssmith.flatpakrepo <<EOF
+          [Flatpak Repo]
+          Title=hcssmith
+          Url=https://$SITE_DOMAIN
+          Homepage=https://github.com/hcssmith/flatpak-repo
+          Comment=hcssmith's personal Flatpak repository
+          Description=Nvim and Neovide built from github.com/hcssmith/flatpak-repo
+          EOF
+          cat > repo/index.html <<EOF
+          <!doctype html>
+          <html lang="en">
+          <head><meta charset="utf-8"><title>hcssmith Flatpak repo</title></head>
+          <body style="font-family: system-ui; max-width: 40rem; margin: 4rem auto; line-height: 1.5">
+          <h1>hcssmith Flatpak repository</h1>
+          <p>Personal builds of Neovim and Neovide.</p>
+          <h2>Add the remote</h2>
+          <pre><code>flatpak remote-add --if-not-exists hcssmith https://$SITE_DOMAIN/hcssmith.flatpakrepo</code></pre>
+          <h2>Install</h2>
+          <pre><code>flatpak install hcssmith com.hcssmith.Neovide
+          flatpak install hcssmith com.hcssmith.Nvim</code></pre>
+          </body>
+          </html>
+          EOF
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: repo
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

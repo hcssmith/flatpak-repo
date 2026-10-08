@@ -57,9 +57,15 @@ jobs:
           key: flatpak-builder-${{ hashFiles('**/*.yml', 'patches/**', 'neovim/config/**') }}
           restore-keys: flatpak-builder-
 
-      # Same builder wrapper buildall.sh uses locally.
-      - name: Install flatpak-builder
+      # ubuntu runner images no longer ship flatpak. The sysctl lifts
+      # Ubuntu's AppArmor restriction on unprivileged user namespaces,
+      # which otherwise breaks bwrap/flatpak sandboxing (no-op elsewhere).
+      - name: Install flatpak and flatpak-builder
         run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          sudo apt-get update
+          sudo apt-get install -y flatpak
+          flatpak --version
           flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
           flatpak --user install --noninteractive -y flathub org.flatpak.Builder
 

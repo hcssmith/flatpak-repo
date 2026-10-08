@@ -54,7 +54,7 @@ vim.filetype.add({
 
 
 require('theme')
-vim.cmd.colorscheme("tokyonight-storm")
+vim.cmd.colorscheme("rose-pine-main")
 
 -- Font for GUI clients (Neovide reads 'guifont'). The family must exist on
 -- the machine rendering the GUI: FiraCode Nerd Font Mono is on this host and
@@ -72,7 +72,7 @@ vim.g.neovide_scroll_animation_length = 0.00
 
 require('telescope')
 require('statusline')
-require('tabline')
+--require('tabline')
 require('ui')
 require('buffers')
 

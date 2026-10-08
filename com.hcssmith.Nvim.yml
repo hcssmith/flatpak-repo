@@ -40,3 +40,23 @@ modules:
         exec /app/bin/nvim.bin "$@"
         WRAPPER
 
+# Build-only artifacts. nvim.bin links luajit, libuv, luv, lpeg, unibilium,
+# utf8proc and tree-sitter statically (verified: no /app libs in its NEEDED
+# entries), so only headers, link metadata and archives are needed while
+# modules build; cleanup runs after the last module finishes.
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /lib/cmake
+  - '*.a'
+  - '*.la'
+  # Shared libs with no runtime consumer: nvim.bin embeds luajit and libuv
+  # statically, and xclip links only libXmu.so.6 (kept).
+  - /lib/libluajit-5.1.so*
+  - /lib/libuv.so*
+  - /lib/libXmuu.so*
+  # Standalone luajit interpreter: only used at build time (LUA_PRG).
+  - /bin/luajit*
+  - /share/man
+  - /share/doc
+

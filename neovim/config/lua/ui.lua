@@ -31,3 +31,8 @@ require('noice').setup({
       lsp_doc_border = false,
     }
   })
+
+vim.keymap.set("n", "<Esc>", function()
+  vim.cmd("noh")          -- Clear search highlights
+  vim.cmd("Noice dismiss") -- Dismiss noice notifications
+end, { desc = "Clear highlights and dismiss Noice" })

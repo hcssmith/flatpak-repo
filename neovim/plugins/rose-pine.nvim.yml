@@ -1,0 +1,9 @@
+name: rose-pine.nvim
+buildsystem: simple
+sources:
+  - type: git
+    url: https://github.com/rose-pine/neovim.git  
+    branch: main
+build-commands:
+  - mkdir -p /app/share/nvim/site/pack/plugins/start/rose-pine.nvim
+  - cp -a . /app/share/nvim/site/pack/plugins/start/rose-pine.nvim

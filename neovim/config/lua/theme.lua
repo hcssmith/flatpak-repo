@@ -11,3 +11,5 @@ require("tokyonight").setup({
     floats = "transparent",
   },
 })
+
+require("rose-pine").setup()

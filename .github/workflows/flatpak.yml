@@ -69,12 +69,13 @@ jobs:
           flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
           flatpak --user install --noninteractive -y flathub org.flatpak.Builder
 
-      # Mirrors buildall.sh (same flags) plus --repo for the export and
-      # --strip so no .Debug extension refs get published.
+      # Mirrors buildall.sh (same flags) plus --repo for the export. Debug
+      # info is split into .Debug extension refs automatically; they are
+      # no-autodownload and tiny (Release builds), so they ship harmlessly.
       - name: Build com.hcssmith.Nvim
         run: |
           flatpak run org.flatpak.Builder --user --install-deps-from=flathub \
-            --force-clean --disable-rofiles-fuse --strip --repo=repo \
+            --force-clean --disable-rofiles-fuse --repo=repo \
             build/com.hcssmith.Nvim com.hcssmith.Nvim.yml
 
       # Neovide layers on the Nvim app (base: com.hcssmith.Nvim,
@@ -88,7 +89,7 @@ jobs:
       - name: Build com.hcssmith.Neovide
         run: |
           flatpak run org.flatpak.Builder --user --install-deps-from=flathub \
-            --force-clean --disable-rofiles-fuse --strip --repo=repo \
+            --force-clean --disable-rofiles-fuse --repo=repo \
             build/com.hcssmith.Neovide com.hcssmith.Neovide.yml
 
       - name: Finalize repo metadata and static deltas

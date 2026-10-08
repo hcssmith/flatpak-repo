@@ -68,7 +68,7 @@ vim.g.neovide_cursor_animate_command_line = false
 vim.g.neovide_scroll_animation_far_lines = 0
 vim.g.neovide_scroll_animation_length = 0.00
 -- Transparent background (pairs with tokyonight transparent = true)
-vim.g.neovide_transparency = 0.85
+--vim.g.neovide_transparency = 0.85
 
 require('telescope')
 require('statusline')

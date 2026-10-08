@@ -1,0 +1,18 @@
+# Desktop integration for GNOME Shell's launcher. Kept as its own module
+# so launcher metadata changes never retrigger the long skia build inside
+# bin/neovide/neovide.yml.
+name: neovide-desktop
+buildsystem: simple
+sources:
+  # Upstream's desktop entry with Icon= set to the flatpak app id, so the
+  # icon resolves from the app's own hicolor export.
+  - type: file
+    path: com.hcssmith.Neovide.desktop
+  # Upstream icon, pinned to the same neovide tag the module builds.
+  - type: file
+    url: https://raw.githubusercontent.com/neovide/neovide/0.16.2/assets/neovide.svg
+    sha256: a6870391ded090cc5f24f0cb40a8ffa67930faf109a419753ec25ac0a03177a9
+    dest-filename: neovide.svg
+build-commands:
+  - install -Dm644 com.hcssmith.Neovide.desktop /app/share/applications/com.hcssmith.Neovide.desktop
+  - install -Dm644 neovide.svg /app/share/icons/hicolor/scalable/apps/com.hcssmith.Neovide.svg

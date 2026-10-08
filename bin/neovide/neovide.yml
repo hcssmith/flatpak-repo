@@ -2,15 +2,34 @@ name: neovide
 buildsystem: simple
 sources:
   - generated-sources.yml
+  # Keep the neovide git source first: bin/neovide/update-sources reads the
+  # first tag: line in this file to know which lockfile to regenerate from.
   - type: git
     url: https://github.com/neovide/neovide
     tag: 0.16.2
+  # Full skia source. skia-bindings' crates (in generated-sources.yml) only
+  # carry the Rust bindings; the C++ library is built from this checkout
+  # because cargo builds run offline and cannot fetch prebuilt binaries.
+  # Must be m145: the 0.93.1 crate's bindings.cpp includes headers at their
+  # m145 paths (e.g. include/effects/SkGradientShader.h), which m146's
+  # header reorganization moved.
+  - type: git
+    url: https://github.com/rust-skia/skia
+    tag: m145-0.93.1
+    commit: 646f426724e437113257799f4615fe606ad2cf45
+    dest: skia
 build-options:
   append-path: /usr/lib/sdk/rust-stable/bin
   env:
+    PATH: /usr/lib/sdk/llvm22/bin:/usr/lib/sdk/rust-stable/bin:/app/bin:/usr/bin
+    LIBCLANG_PATH: /usr/lib/sdk/llvm22/lib
+    FORCE_SKIA_BUILD: '1'
+    SKIA_GN_ARGS: skia_use_wuffs=false
+    SKIA_GN_COMMAND: /app/bin/gn
+    SKIA_NINJA_COMMAND: /usr/bin/ninja
+    SKIA_SOURCE_DIR: /run/build/neovide/skia
+    SKIA_USE_SYSTEM_LIBRARIES: '1'
     CARGO_HOME: /run/build/neovide/cargo
-buildsystem: simple
 build-commands:
   - cargo --frozen build --release
   - install -Dm755 target/release/neovide -t /app/bin
-

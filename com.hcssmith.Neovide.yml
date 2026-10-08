@@ -1,10 +1,16 @@
-
 id: com.hcssmith.Neovide
 runtime: org.freedesktop.Sdk
 runtime-version: "26.08"
 sdk: org.freedesktop.Sdk
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.rust-stable
+  # skia-bindings' bindgen needs a libclang newer than the SDK's
+  - org.freedesktop.Sdk.Extension.llvm22
+
+# Reuse the nvim app as the base so nvim, its deps, parsers, ripgrep and
+# the clipboard tools are never rebuilt for this app.
+base: com.hcssmith.Nvim
+base-version: master
 
 command: neovide
 
@@ -12,34 +18,19 @@ finish-args:
   - --share=ipc
   - --socket=x11
   - --socket=wayland
+  - --device=dri
   - --filesystem=home
 
 modules:
-  - neovim/build-deps.yml
-  - neovim/ts-full.yml
-  - neovim/neovim-source.yml
-  - neovim/config.yml
-  - neovim/plugins.yml
-
-  - bin/ripgrep/ripgrep.yml
-
-  # Clipboard providers: nvim picks wl-clipboard on wayland sessions and
-  # xclip on X11/XWayland automatically ($WAYLAND_DISPLAY / $DISPLAY).
-  # libXmu is xclip's build dependency and must come before it.
-  - lib/libxmu.yml
-  - bin/wl-clipboard.yml
-  - bin/xclip.yml
+  # gn builds skia; it is only needed at build time but installs to
+  # /app/bin, so it is cleaned up below.
+  - lib/gn.yml
 
   - bin/neovide/neovide.yml
 
-  - name: neovim-wrapper
-    buildsystem: simple
-    build-commands:
-      - mv /app/bin/nvim /app/bin/nvim.bin
-      - |
-        install -Dm755 /dev/stdin /app/bin/nvim <<'WRAPPER'
-        #!/bin/sh
-        export XDG_CONFIG_HOME=/app/etc
-        exec /app/bin/nvim.bin "$@"
-        WRAPPER
+  # Launcher entry + icon for GNOME Shell; separate module so it can be
+  # tweaked without rebuilding neovide/skia.
+  - bin/neovide/desktop.yml
 
+cleanup:
+  - /bin/gn

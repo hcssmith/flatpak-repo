@@ -1,0 +1,14 @@
+name: wl-clipboard
+buildsystem: meson
+config-opts:
+  # Completions for shells the flatpak never runs; skip installing them.
+  - -Dzshcompletiondir=no
+  - -Dfishcompletiondir=no
+sources:
+  - type: git
+    url: https://github.com/bugaevc/wl-clipboard.git
+    tag: v2.3.0
+    disable-submodules: true
+    disable-lfs: true
+cleanup:
+  - /share/man

@@ -1,0 +1,16 @@
+name: neovide
+buildsystem: simple
+sources:
+  - generated-sources.yml
+  - type: git
+    url: https://github.com/neovide/neovide
+    tag: 0.16.2
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/neovide/cargo
+buildsystem: simple
+build-commands:
+  - cargo --frozen build --release
+  - install -Dm755 target/release/neovide -t /app/bin
+

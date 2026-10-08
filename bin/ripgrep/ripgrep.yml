@@ -1,0 +1,14 @@
+name: ripgrep
+sources:
+  - generated-sources.yml
+  - type: git
+    url: https://github.com/BurntSushi/ripgrep
+    tag: 15.2.0
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/ripgrep/cargo
+buildsystem: simple
+build-commands:
+  - cargo --frozen build --release
+  - install -Dm755 target/release/rg -t /app/bin

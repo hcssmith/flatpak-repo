@@ -1,11 +1,12 @@
-id: com.hcssmith.Nvim
+
+id: com.hcssmith.Neovide
 runtime: org.freedesktop.Sdk
 runtime-version: "26.08"
 sdk: org.freedesktop.Sdk
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.rust-stable
 
-command: nvim
+command: neovide
 
 finish-args:
   - --share=ipc
@@ -28,6 +29,8 @@ modules:
   - lib/libxmu.yml
   - bin/wl-clipboard.yml
   - bin/xclip.yml
+
+  - bin/neovide/neovide.yml
 
   - name: neovim-wrapper
     buildsystem: simple

@@ -1,0 +1,26 @@
+#!/bin/sh
+# Regenerate bin/neovide/generated-sources.yml from the Cargo.lock of the
+# ripgrep release that neovide.yml pins, so the vendored crates always
+# match the source the module builds (cargo --frozen requires this).
+#
+# Usage:
+#   bin/ripgrep/update-sources [ref]
+#
+# With no argument the tag is read from ripgrep.yml; pass an explicit ref
+# (tag or branch) to preview a bump before editing the manifest. Commit
+# Cargo.lock and generated-sources.yml together with the tag change.
+set -eu
+cd "$(dirname -- "$0")/../.."
+
+REF="${1:-$(sed -n 's/^[[:space:]]*tag:[[:space:]]*//p' bin/neovide/neovide.yml | head -n 1)}"
+if [ -z "$REF" ]; then
+  echo "error: no tag: found in bin/neovide/neovide.yml and no ref given" >&2
+  exit 1
+fi
+
+echo "Fetching neovide Cargo.lock @ $REF" >&2
+curl -fsSL "https://raw.githubusercontent.com/neovide/neovide/$REF/Cargo.lock" \
+  -o bin/neovide/Cargo.lock
+
+tools/generate-cargo-sources.sh --yaml bin/neovide/Cargo.lock \
+  -o bin/neovide/generated-sources.yml

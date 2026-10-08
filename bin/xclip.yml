@@ -1,0 +1,14 @@
+# X11 clipboard tool. nvim's provider uses it on X11/XWayland sessions;
+# see runtime/autoload/provider/clipboard.vim in neovim for the selection
+# order (wayland tools win when $WAYLAND_DISPLAY is set). Build-depends
+# on lib/libxmu.yml, which must be listed before this module.
+name: xclip
+sources:
+  - type: git
+    url: https://github.com/astrand/xclip.git
+    tag: 0.13
+    disable-submodules: true
+    disable-lfs: true
+cleanup:
+  - /share/man
+  - /bin/xclip-*file

@@ -1,0 +1,3 @@
+.zcodeignore
+build/
+tools/cargo-generator/venv/

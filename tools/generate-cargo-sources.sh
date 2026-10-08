@@ -15,14 +15,18 @@
 # The generator is pinned to a fixed upstream revision for reproducible
 # output; override with GENERATOR_REF=<git sha> to test a newer one.
 set -eu
-cd "$(dirname "$0")"
+
+# Anchor all tool state to this script's directory without changing the
+# working directory: the caller's relative paths (lockfile, -o output)
+# must keep resolving against wherever the command was invoked from.
+TOOLS_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 GENERATOR_REF="${GENERATOR_REF:-74697c75b630d7330e77250fc13cb5ea688d9479}"
 GENERATOR_URL_BASE="https://raw.githubusercontent.com/flatpak/flatpak-builder-tools"
 # Runtime deps from upstream cargo/pyproject.toml at the pinned revision.
 DEPS="aiohttp>=3.9.5,<4.0.0 PyYAML>=6.0.2,<7.0.0 tomlkit>=0.13.3,<1.0"
 
-STATE=cargo-generator
+STATE="$TOOLS_DIR/cargo-generator"
 VENV="$STATE/venv"
 REF_FILE="$STATE/ref"
 SCRIPT="$STATE/flatpak-cargo-generator.py"
@@ -46,7 +50,7 @@ fi
 # shellcheck disable=SC1091
 . "$VENV/bin/activate"
 # Idempotent: a no-op when the venv already satisfies the pins.
-pip install --quiet $DEPS
+pip install --quiet --disable-pip-version-check $DEPS
 
 if [ ! -f "$SCRIPT" ] || [ "$(cat "$REF_FILE" 2>/dev/null)" != "$GENERATOR_REF" ]; then
   echo "Fetching flatpak-cargo-generator.py @ $GENERATOR_REF" >&2

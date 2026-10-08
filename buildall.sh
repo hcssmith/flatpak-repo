@@ -16,5 +16,11 @@ for m in $(mount | grep -oP "$PWD/\.flatpak-builder/rofiles/rofiles-\S+" || true
 done
 rm -rf .flatpak-builder/rofiles
 
-exec flatpak run org.flatpak.Builder  --user --install-deps-from=flathub --install --force-clean --disable-rofiles-fuse build com.hcssmith.Nvim.yml "$@"
+# Vendored cargo sources live in bin/ripgrep/generated-sources.yml and are
+# regenerated on demand with bin/ripgrep/update-sources when the pinned
+# ripgrep tag changes; keeping this out of the build keeps builds
+# reproducible and the tree clean.
+
+flatpak run org.flatpak.Builder  --user --install-deps-from=flathub --install --force-clean --disable-rofiles-fuse build com.hcssmith.Nvim.yml "$@"
+flatpak run org.flatpak.Builder  --user --install-deps-from=flathub --install --force-clean --disable-rofiles-fuse build com.hcssmith.Neovide.yml "$@"
 

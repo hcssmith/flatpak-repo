@@ -131,11 +131,13 @@ jobs:
             --gpg-sign="$FLATPAK_GPG_FINGERPRINT" \
             --title "hcssmith" repo
 
-      # Extra files at the site root; flatpak only ever fetches summary,
-      # objects/ and deltas/, so they do not interfere with the remote.
+      # The published frontend lives in html/ (template + apps.txt) and is
+      # rendered by html/render.py into the site root; it also copies any
+      # extra static files dropped in html/. The flatpakrepo is generated
+      # here because it embeds the signing key.
       - name: Add site files
         run: |
-          echo "$SITE_DOMAIN" > repo/CNAME
+          python3 html/render.py repo
           cat > repo/hcssmith.flatpakrepo <<EOF
           [Flatpak Repo]
           Title=hcssmith
@@ -145,21 +147,6 @@ jobs:
           Description=Nvim and Neovide built from github.com/hcssmith/flatpak-repo
           EOF
           echo "GPGKey=$(gpg --export --armor "$FLATPAK_GPG_FINGERPRINT" | base64 -w0)" >> repo/hcssmith.flatpakrepo
-          cat > repo/index.html <<EOF
-          <!doctype html>
-          <html lang="en">
-          <head><meta charset="utf-8"><title>hcssmith Flatpak repo</title></head>
-          <body style="font-family: system-ui; max-width: 40rem; margin: 4rem auto; line-height: 1.5">
-          <h1>hcssmith Flatpak repository</h1>
-          <p>Personal builds of Neovim and Neovide.</p>
-          <h2>Add the remote</h2>
-          <pre><code>flatpak remote-add --if-not-exists hcssmith https://$SITE_DOMAIN/hcssmith.flatpakrepo</code></pre>
-          <h2>Install</h2>
-          <pre><code>flatpak install hcssmith com.hcssmith.Neovide
-          flatpak install hcssmith com.hcssmith.Nvim</code></pre>
-          </body>
-          </html>
-          EOF
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

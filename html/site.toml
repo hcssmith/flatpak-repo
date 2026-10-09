@@ -1,0 +1,56 @@
+# flatpak.hcssmith.com — page content.
+#
+# This is the only file you edit to change the site: apps, sections,
+# commands, notes. Push to master and CI re-renders and publishes it.
+# Rendered by html/render.py from html/index.html; requires Python 3.11+
+# (stdlib tomllib).
+
+site_url = "https://flatpak.hcssmith.com"
+
+# Page intro paragraph under the title.
+intro = "Personal Flatpak builds of the tools I use daily. Every commit and the repo summary are GPG-signed; the OSTree repository this page lives in is the one your Flatpak client talks to."
+
+# ---------------------------------------------------------------------------
+# Apps. Each gets a heading, blurb and a copyable install command, rendered
+# wherever a section below sets apps = true.
+
+[[apps]]
+id = "com.hcssmith.Nvim"
+name = "Nvim"
+blurb = "Neovim 0.12 with my config baked in — 26 tree-sitter parsers, ripgrep, wl-clipboard and xclip."
+
+[[apps]]
+id = "com.hcssmith.Neovide"
+name = "Neovide"
+blurb = "The Neovim GUI on the Nvim base app — same editor and config, skia-rendered and GPU accelerated. Installing it pulls Nvim automatically."
+
+# ---------------------------------------------------------------------------
+# Page sections, rendered top to bottom. Fields per section:
+#   heading  (required) — section title
+#   note     (optional) — paragraph shown under the heading
+#   commands (optional) — shell lines, each a copyable command block
+#   apps     (optional) — set to true to render the app list here
+
+[[sections]]
+heading = "add the remote"
+commands = [
+  "flatpak remote-add hcssmith https://flatpak.hcssmith.com/hcssmith.flatpakrepo",
+]
+
+[[sections]]
+heading = "apps"
+apps = true
+
+[[sections]]
+heading = "reinstalling from scratch"
+note = "Everything needed after wiping the laptop. Installing Neovide pulls the Nvim base app — config, parsers, ripgrep and clipboard tools — automatically. The desktop entry shows up in GNOME Shell as Neovide."
+commands = [
+  "flatpak remote-add hcssmith https://flatpak.hcssmith.com/hcssmith.flatpakrepo",
+  "flatpak install hcssmith com.hcssmith.Neovide",
+]
+
+[[sections]]
+heading = "updating"
+commands = [
+  "flatpak update",
+]

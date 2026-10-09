@@ -11,8 +11,12 @@ name: Flatpak repo
 #   * DNS: CNAME flatpak.hcssmith.com -> hcssmith.github.io, then enable
 #     "Enforce HTTPS" once the certificate has been issued.
 #
-# The repo is served over HTTPS and left unsigned (no GPG key), so clients
-# install from hcssmith.flatpakrepo with gpg-verify off.
+# The repo is GPG-signed with a dedicated key: every exported commit,
+# the summary and the static deltas are signed in CI, and
+# hcssmith.flatpakrepo ships the public key so clients verify both the
+# summary and commits (required for system installs). The private key
+# (base64 armored export) lives in the repo secret
+# FLATPAK_GPG_PRIVATE_KEY; the fingerprint is pinned below.
 
 on:
   push:
@@ -24,6 +28,7 @@ permissions:
 
 env:
   SITE_DOMAIN: flatpak.hcssmith.com
+  FLATPAK_GPG_FINGERPRINT: 26AC310951E6854A786D022C6BED4B2DE001F7F6
 
 concurrency:
   group: flatpak-pages
@@ -82,28 +87,34 @@ jobs:
           dbus-daemon --session --fork --address="unix:path=$RUNNER_TEMP/session-bus"
           echo "DBUS_SESSION_BUS_ADDRESS=unix:path=$RUNNER_TEMP/session-bus" >> "$GITHUB_ENV"
 
-      # Mirrors buildall.sh (same flags) plus --repo for the export. Debug
-      # info is split into .Debug extension refs automatically; they are
-      # no-autodownload and tiny (Release builds), so they ship harmlessly.
+      # Used by --gpg-sign below; the Builder sandbox can read
+      # $HOME/.gnupg through --filesystem=host.
+      - name: Import repo signing key
+        env:
+          GPG_PRIVATE_KEY_B64: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
+        run: echo "$GPG_PRIVATE_KEY_B64" | base64 -d | gpg --import
+
+      # Mirrors buildall.sh (same flags) plus --repo for the export and
+      # --gpg-sign for signed commits. Debug info is split into .Debug
+      # extension refs automatically; they are no-autodownload and tiny
+      # (Release builds), so they ship harmlessly.
       - name: Build com.hcssmith.Nvim
         run: |
           flatpak run --env=DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
             org.flatpak.Builder --user --install-deps-from=flathub \
             --force-clean --disable-rofiles-fuse --repo=repo \
+            --gpg-sign="$FLATPAK_GPG_FINGERPRINT" \
             build/com.hcssmith.Nvim com.hcssmith.Nvim.yml
 
       # Neovide layers on the Nvim app (base: com.hcssmith.Nvim,
       # base-version: master); install it from the repo just exported so
       # flatpak-builder can resolve the base.
-      # The exported repo is unsigned. Plain `remote-add` bakes
-      # gpg-verify-summary=true into the remote config and modern flatpak
-      # has no remote-modify flag to unset it, so register the remote from
-      # a GPGKey-less .flatpakrepo (same mechanism real clients use),
-      # which sets gpg-verify-summary=false.
+      # The exported repo is signed; --gpg-import registers the key so
+      # the signed commits verify during the install.
       - name: Install base app for the Neovide build
         run: |
-          printf '[Flatpak Repo]\nUrl=file://%s/repo\n' "$PWD" > local.flatpakrepo
-          flatpak --user remote-add --if-not-exists --from hcssmith-local local.flatpakrepo
+          gpg --export --armor "$FLATPAK_GPG_FINGERPRINT" > signing-key.asc
+          flatpak --user remote-add --if-not-exists --gpg-import=signing-key.asc hcssmith-local "$PWD/repo"
           flatpak --user install --noninteractive --or-update hcssmith-local com.hcssmith.Nvim
 
       - name: Build com.hcssmith.Neovide
@@ -111,10 +122,14 @@ jobs:
           flatpak run --env=DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
             org.flatpak.Builder --user --install-deps-from=flathub \
             --force-clean --disable-rofiles-fuse --repo=repo \
+            --gpg-sign="$FLATPAK_GPG_FINGERPRINT" \
             build/com.hcssmith.Neovide com.hcssmith.Neovide.yml
 
       - name: Finalize repo metadata and static deltas
-        run: flatpak build-update-repo --generate-static-deltas --title "hcssmith" repo
+        run: |
+          flatpak build-update-repo --generate-static-deltas \
+            --gpg-sign="$FLATPAK_GPG_FINGERPRINT" \
+            --title "hcssmith" repo
 
       # Extra files at the site root; flatpak only ever fetches summary,
       # objects/ and deltas/, so they do not interfere with the remote.
@@ -129,6 +144,7 @@ jobs:
           Comment=hcssmith's personal Flatpak repository
           Description=Nvim and Neovide built from github.com/hcssmith/flatpak-repo
           EOF
+          echo "GPGKey=$(gpg --export --armor "$FLATPAK_GPG_FINGERPRINT" | base64 -w0)" >> repo/hcssmith.flatpakrepo
           cat > repo/index.html <<EOF
           <!doctype html>
           <html lang="en">

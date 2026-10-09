@@ -100,7 +100,8 @@ jobs:
       # carries no GPGKey).
       - name: Install base app for the Neovide build
         run: |
-          flatpak --user remote-add --if-not-exists --gpg-verify=false --gpg-verify-summary=false hcssmith-local "$PWD/repo"
+          flatpak --user remote-add --if-not-exists hcssmith-local "$PWD/repo"
+          flatpak --user remote-modify --gpg-verify=false --gpg-verify-summary=false hcssmith-local
           flatpak --user install --noninteractive --or-update hcssmith-local com.hcssmith.Nvim
 
       - name: Build com.hcssmith.Neovide

@@ -95,13 +95,15 @@ jobs:
       # Neovide layers on the Nvim app (base: com.hcssmith.Nvim,
       # base-version: master); install it from the repo just exported so
       # flatpak-builder can resolve the base.
-      # The exported repo is unsigned; the local remote must say so
-      # explicitly (real clients get this from hcssmith.flatpakrepo, which
-      # carries no GPGKey).
+      # The exported repo is unsigned. Plain `remote-add` bakes
+      # gpg-verify-summary=true into the remote config and modern flatpak
+      # has no remote-modify flag to unset it, so register the remote from
+      # a GPGKey-less .flatpakrepo (same mechanism real clients use),
+      # which sets gpg-verify-summary=false.
       - name: Install base app for the Neovide build
         run: |
-          flatpak --user remote-add --if-not-exists hcssmith-local "$PWD/repo"
-          flatpak --user remote-modify --gpg-verify=false --gpg-verify-summary=false hcssmith-local
+          printf '[Flatpak Repo]\nUrl=file://%s/repo\n' "$PWD" > local.flatpakrepo
+          flatpak --user remote-add --if-not-exists --from hcssmith-local local.flatpakrepo
           flatpak --user install --noninteractive --or-update hcssmith-local com.hcssmith.Nvim
 
       - name: Build com.hcssmith.Neovide

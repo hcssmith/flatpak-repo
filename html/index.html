@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{TITLE}}</title>
+<title>flatpak.hcssmith.com</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%230d1117'/><text x='2' y='12' font-family='monospace' font-size='10' fill='%237ee787'>&gt;_</text></svg>">
 <style>
   :root {
@@ -44,7 +44,6 @@
   .hash { color: var(--muted); font-weight: 400; user-select: none; margin-right: .1em; }
   .p { color: var(--accent); user-select: none; }
   p { margin: .4rem 0 1rem; }
-  .note { color: var(--muted); }
   .crumb { color: var(--muted); font-size: .85rem; margin: 0 0 2.5rem; }
   .app-id { color: var(--muted); font-size: .82em; font-weight: 400; }
   .cmd { position: relative; margin: .35rem 0 0; }
@@ -87,10 +86,50 @@
 
 <p class="crumb">github.com/hcssmith/flatpak-repo · built &amp; signed by github actions</p>
 
-<h1><span class="hash">#</span> {{TITLE}}</h1>
-<p>{{INTRO}}</p>
+<h1><span class="hash">#</span> flatpak.hcssmith.com</h1>
+<p>Personal Flatpak builds of the tools I use daily. Every commit and the
+repo summary are GPG-signed; the OSTree repository this page lives in is
+the one your Flatpak client talks to.</p>
 
-{{SECTIONS}}
+<section>
+<h2><span class="hash">##</span> add the remote</h2>
+<div class="cmd">
+  <pre><code><span class="p">$</span> flatpak remote-add hcssmith https://flatpak.hcssmith.com/hcssmith.flatpakrepo</code></pre>
+  <button class="copy" type="button" data-cmd="flatpak remote-add hcssmith https://flatpak.hcssmith.com/hcssmith.flatpakrepo">copy</button>
+</div>
+</section>
+
+<section>
+<h2><span class="hash">##</span> apps</h2>
+{{APPS}}
+</section>
+
+<section>
+<h2><span class="hash">##</span> reinstalling from scratch</h2>
+<p class="note">Everything needed after wiping the laptop. Installing Neovide pulls
+the Nvim base app — config, parsers, ripgrep and clipboard tools —
+automatically. st is standalone.</p>
+<div class="cmd">
+  <pre><code><span class="p">$</span> flatpak remote-add hcssmith https://flatpak.hcssmith.com/hcssmith.flatpakrepo</code></pre>
+  <button class="copy" type="button" data-cmd="flatpak remote-add hcssmith https://flatpak.hcssmith.com/hcssmith.flatpakrepo">copy</button>
+</div>
+<div class="cmd">
+  <pre><code><span class="p">$</span> flatpak install hcssmith com.hcssmith.Neovide</code></pre>
+  <button class="copy" type="button" data-cmd="flatpak install hcssmith com.hcssmith.Neovide">copy</button>
+</div>
+<div class="cmd">
+  <pre><code><span class="p">$</span> flatpak install hcssmith com.hcssmith.St</code></pre>
+  <button class="copy" type="button" data-cmd="flatpak install hcssmith com.hcssmith.St">copy</button>
+</div>
+</section>
+
+<section>
+<h2><span class="hash">##</span> updating</h2>
+<div class="cmd">
+  <pre><code><span class="p">$</span> flatpak update</code></pre>
+  <button class="copy" type="button" data-cmd="flatpak update">copy</button>
+</div>
+</section>
 
 <footer>
   generated {{GENERATED}} ·

@@ -1,0 +1,30 @@
+# apps.toml — the app registry. Single source of truth for:
+#
+#   * CI (.github/workflows/flatpak.yml) — every [[apps]] entry is built
+#     and published to the flatpak repo. ORDER MATTERS: list base apps
+#     before apps that use them via `base:` (Nvim before Neovide). Each
+#     app is installed --user after building so later entries can build
+#     on it.
+#   * The site (html/render.py) — name + blurb of each app on
+#     flatpak.hcssmith.com. Page structure lives in html/index.html.
+#
+# Adding an app: drop its manifest next to the others, add an [[apps]]
+# entry here, push. Nothing else to touch.
+
+[[apps]]
+id = "com.hcssmith.Nvim"
+manifest = "com.hcssmith.Nvim.yml"
+name = "Nvim"
+blurb = "Neovim 0.12 with my config baked in — 26 tree-sitter parsers, ripgrep, wl-clipboard and xclip. Base app for Neovide."
+
+[[apps]]
+id = "com.hcssmith.Neovide"
+manifest = "com.hcssmith.Neovide.yml"
+name = "Neovide"
+blurb = "The Neovim GUI on the Nvim base app — same editor and config, skia-rendered and GPU accelerated. Installing it pulls Nvim automatically."
+
+[[apps]]
+id = "com.hcssmith.St"
+manifest = "com.hcssmith.St.yml"
+name = "st"
+blurb = "My fork of the suckless terminal, running through XWayland, with the st-256color terminfo bundled so TERM works out of the box."

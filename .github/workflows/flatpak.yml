@@ -1,8 +1,9 @@
 name: Flatpak repo
 
-# Builds com.hcssmith.Nvim and com.hcssmith.Neovide and publishes the
-# resulting OSTree repo to GitHub Pages, served from
-# https://flatpak.hcssmith.com with the site root as the repo root.
+# Builds every app listed in apps.toml and publishes the resulting
+# OSTree repo to GitHub Pages, served from https://flatpak.hcssmith.com
+# with the site root as the repo root. New app = one [[apps]] entry in
+# apps.toml; no workflow edits needed.
 #
 # One-time repo setup:
 #   * Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
@@ -59,7 +60,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .flatpak-builder
-          key: flatpak-builder-${{ hashFiles('**/*.yml', 'patches/**', 'neovim/config/**') }}
+          key: flatpak-builder-${{ hashFiles('**/*.yml', 'apps.toml', 'patches/**', 'neovim/config/**') }}
           restore-keys: flatpak-builder-
 
       # ubuntu runner images no longer ship flatpak. The sysctl lifts
@@ -94,44 +95,33 @@ jobs:
           GPG_PRIVATE_KEY_B64: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
         run: echo "$GPG_PRIVATE_KEY_B64" | base64 -d | gpg --import
 
-      # Mirrors buildall.sh (same flags) plus --repo for the export and
-      # --gpg-sign for signed commits. Debug info is split into .Debug
-      # extension refs automatically; they are no-autodownload and tiny
-      # (Release builds), so they ship harmlessly.
-      - name: Build com.hcssmith.Nvim
+      # Single source of truth for what gets built: apps.toml. Apps build
+      # in listed order (base apps first), each exported to ./repo and
+      # installed --user from it so later apps resolve earlier ones as
+      # `base:`. The exported repo is signed; --gpg-import registers the
+      # key so installs verify. Debug info is split into .Debug extension
+      # refs automatically; they are no-autodownload and tiny (Release
+      # builds), so they ship harmlessly.
+      - name: Build apps from registry
         run: |
-          flatpak run --env=DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
-            org.flatpak.Builder --user --install-deps-from=flathub \
-            --force-clean --disable-rofiles-fuse --repo=repo \
-            --gpg-sign="$FLATPAK_GPG_FINGERPRINT" \
-            build/com.hcssmith.Nvim com.hcssmith.Nvim.yml
-
-      # Neovide layers on the Nvim app (base: com.hcssmith.Nvim,
-      # base-version: master); install it from the repo just exported so
-      # flatpak-builder can resolve the base.
-      # The exported repo is signed; --gpg-import registers the key so
-      # the signed commits verify during the install.
-      - name: Install base app for the Neovide build
-        run: |
+          mkdir -p repo
           gpg --export --armor "$FLATPAK_GPG_FINGERPRINT" > signing-key.asc
           flatpak --user remote-add --if-not-exists --gpg-import=signing-key.asc hcssmith-local "$PWD/repo"
-          flatpak --user install --noninteractive --or-update hcssmith-local com.hcssmith.Nvim
-
-      - name: Build com.hcssmith.Neovide
-        run: |
-          flatpak run --env=DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
-            org.flatpak.Builder --user --install-deps-from=flathub \
-            --force-clean --disable-rofiles-fuse --repo=repo \
-            --gpg-sign="$FLATPAK_GPG_FINGERPRINT" \
-            build/com.hcssmith.Neovide com.hcssmith.Neovide.yml
-
-      - name: Build com.hcssmith.St
-        run: |
-          flatpak run --env=DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
-            org.flatpak.Builder --user --install-deps-from=flathub \
-            --force-clean --disable-rofiles-fuse --repo=repo \
-            --gpg-sign="$FLATPAK_GPG_FINGERPRINT" \
-            build/com.hcssmith.St com.hcssmith.St.yml
+          python3 - <<'PY' > app-list.txt
+          import tomllib
+          for app in tomllib.load(open("apps.toml", "rb"))["apps"]:
+              print(f'{app["id"]}\t{app["manifest"]}')
+          PY
+          while IFS=$'\t' read -r id manifest; do
+            echo "::group::Build $id"
+            flatpak run --env=DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
+              org.flatpak.Builder --user --install-deps-from=flathub \
+              --force-clean --disable-rofiles-fuse --repo=repo \
+              --gpg-sign="$FLATPAK_GPG_FINGERPRINT" \
+              "build/$id" "$manifest"
+            flatpak --user install --noninteractive --or-update hcssmith-local "$id"
+            echo "::endgroup::"
+          done < app-list.txt
 
       - name: Finalize repo metadata and static deltas
         run: |
@@ -139,10 +129,11 @@ jobs:
             --gpg-sign="$FLATPAK_GPG_FINGERPRINT" \
             --title "hcssmith" repo
 
-      # The published frontend lives in html/ (template + apps.txt) and is
-      # rendered by html/render.py into the site root; it also copies any
-      # extra static files dropped in html/. The flatpakrepo is generated
-      # here because it embeds the signing key.
+      # The published frontend is rendered from apps.toml (the same
+      # registry the build loop uses) into html/index.html by
+      # html/render.py, which also copies any extra static files dropped
+      # in html/. The flatpakrepo is generated here because it embeds the
+      # signing key.
       - name: Add site files
         run: |
           python3 html/render.py repo

@@ -1,0 +1,48 @@
+#!/bin/sh
+# Run a locally built app in its real sandbox without installing it.
+#
+# Usage: ./dev-run MANIFEST.yml [COMMAND [ARGS...]]
+#
+# Builds incrementally into .local-build/<name>/ (module results come
+# from the shared .flatpak-builder cache, so warm builds are quick),
+# then runs COMMAND under `flatpak build` with the manifest's
+# finish-args forwarded as sandbox flags.
+#
+# Why not flatpak-builder --run: it gives the plain build sandbox and
+# ignores finish-args, so GUI apps get no X11/Wayland sockets. The
+# lower-level `flatpak build` accepts the same flag namespace
+# (--socket=x11, --share=ipc, --filesystem=...) and sets DISPLAY and
+# WAYLAND_DISPLAY itself; the caller's working directory is preserved.
+#
+# COMMAND defaults to the manifest's `command:`. Examples:
+#   ./dev-run com.hcssmith.St.yml            # launch st
+#   ./dev-run com.hcssmith.St.yml sh         # shell inside the sandbox
+#   ./dev-run com.hcssmith.Nvim.yml nvim
+set -e
+cd "$(dirname "$0")"
+
+if [ $# -lt 1 ]; then
+  sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
+  exit 1
+fi
+
+manifest=$1
+shift
+
+name=${manifest##*/}
+name=${name%.yml}
+builddir=".local-build/$name"
+
+# finish-args map 1:1 onto flatpak build sandbox flags.
+finish_args=$(awk '/^finish-args:/{f=1;next} /^[A-Za-z-]+:/{f=0} f && /^ +- --/{print $2}' "$manifest")
+
+# Default to the manifest's own command: line.
+[ $# -gt 0 ] || set -- "$(awk '/^command:/{print $2; exit}' "$manifest")"
+
+# Build into the per-app dir; --force-clean just empties the staging
+# dir, the .flatpak-builder module cache makes warm rebuilds instant.
+# No --install: nothing touches your installations.
+flatpak run org.flatpak.Builder --user --install-deps-from=flathub \
+  --force-clean --disable-rofiles-fuse "$builddir" "$manifest"
+
+exec flatpak build $finish_args "$builddir" "$@"

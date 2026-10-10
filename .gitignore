@@ -1,3 +1,4 @@
 .zcodeignore
 build/
 tools/cargo-generator/venv/
+.local-build/

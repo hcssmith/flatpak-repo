@@ -22,9 +22,3 @@ id = "com.hcssmith.Neovide"
 manifest = "com.hcssmith.Neovide.yml"
 name = "Neovide"
 blurb = "The Neovim GUI on the Nvim base app — same editor and config, skia-rendered and GPU accelerated. Installing it pulls Nvim automatically."
-
-[[apps]]
-id = "com.hcssmith.St"
-manifest = "com.hcssmith.St.yml"
-name = "st"
-blurb = "My fork of the suckless terminal, running through XWayland, with the st-256color terminfo bundled so TERM works out of the box."

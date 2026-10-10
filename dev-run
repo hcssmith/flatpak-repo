@@ -45,4 +45,12 @@ finish_args=$(awk '/^finish-args:/{f=1;next} /^[A-Za-z-]+:/{f=0} f && /^ +- --/{
 flatpak run org.flatpak.Builder --user --install-deps-from=flathub \
   --force-clean --disable-rofiles-fuse "$builddir" "$manifest"
 
-exec flatpak build $finish_args "$builddir" "$@"
+# exec flatpak build $finish_args "$builddir" "$@"
+#
+# flatpak build (unlike a real app run) does not point TERMINFO_DIRS at
+# the bundled /app/share/terminfo, so terminal apps like st get broken
+# colours ("unknown terminal"); add it, keeping the SDK's own terminfo
+# as fallback.
+exec flatpak build $finish_args \
+  --env=TERMINFO_DIRS=/app/share/terminfo:/usr/share/terminfo \
+  "$builddir" "$@"

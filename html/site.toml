@@ -24,6 +24,11 @@ id = "com.hcssmith.Neovide"
 name = "Neovide"
 blurb = "The Neovim GUI on the Nvim base app — same editor and config, skia-rendered and GPU accelerated. Installing it pulls Nvim automatically."
 
+[[apps]]
+id = "com.hcssmith.St"
+name = "St"
+blurb = "My fork of suckless st terminal."
+
 # ---------------------------------------------------------------------------
 # Page sections, rendered top to bottom. Fields per section:
 #   heading  (required) — section title

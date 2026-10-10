@@ -125,6 +125,14 @@ jobs:
             --gpg-sign="$FLATPAK_GPG_FINGERPRINT" \
             build/com.hcssmith.Neovide com.hcssmith.Neovide.yml
 
+      - name: Build com.hcssmith.St
+        run: |
+          flatpak run --env=DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
+            org.flatpak.Builder --user --install-deps-from=flathub \
+            --force-clean --disable-rofiles-fuse --repo=repo \
+            --gpg-sign="$FLATPAK_GPG_FINGERPRINT" \
+            build/com.hcssmith.St com.hcssmith.St.yml
+
       - name: Finalize repo metadata and static deltas
         run: |
           flatpak build-update-repo --generate-static-deltas \

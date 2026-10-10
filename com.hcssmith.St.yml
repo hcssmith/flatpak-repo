@@ -1,0 +1,27 @@
+id: com.hcssmith.St
+runtime: org.freedesktop.Sdk
+runtime-version: "26.08"
+sdk: org.freedesktop.Sdk
+
+command: st
+
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --filesystem=home
+
+modules:
+  - name: st
+    buildsystem: simple
+    sources:
+      - type: git
+        url: https://github.com/hcssmith/st
+        branch: master
+      - type: file
+        path: patches/st/config.h
+        dest-filename: config.h
+    build-commands:
+      - make clean
+      - make CC="gcc -std=c99 -fPIE"
+      - TERMINFO=/app/share/terminfo make install PREFIX=/app
+      - mv /app/share/applications/st.desktop /app/share/applications/com.hcssmith.St.desktop

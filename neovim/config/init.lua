@@ -59,7 +59,7 @@ vim.cmd.colorscheme("rose-pine-main")
 -- Font for GUI clients (Neovide reads 'guifont'). The family must exist on
 -- the machine rendering the GUI: FiraCode Nerd Font Mono is on this host and
 -- the Nerd Font glyphs cover the devicons used by the statusline/tabline.
-vim.opt.guifont = "FiraCode Nerd Font Mono:h15"
+vim.opt.guifont = "FiraCode Nerd Font Mono:h13"
 vim.g.neovide_position_animation_length = 0
 vim.g.neovide_cursor_animation_length = 0.00
 vim.g.neovide_cursor_trail_size = 0

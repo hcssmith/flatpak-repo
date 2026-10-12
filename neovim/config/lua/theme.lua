@@ -12,4 +12,8 @@ require("tokyonight").setup({
   },
 })
 
-require("rose-pine").setup()
+require("rose-pine").setup({
+  styles = {
+    transparency = true,
+  },
+})

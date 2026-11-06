@@ -7,15 +7,15 @@ vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Telescope help ta
 
 local function find_directory()
   local root = vim.fn.expand("~/Git")
-  local directories = vim.fn.glob(root .. "/*", false, true)
+  local directories = vim.fn.glob(root .. "/*/*", false, true)
   local entries = {}
 
   for _, directory in ipairs(directories) do
     if vim.fn.isdirectory(directory) == 1 then
       table.insert(entries, {
         value = directory,
-        display = vim.fn.fnamemodify(directory, ":t"),
-        ordinal = vim.fn.fnamemodify(directory, ":t"),
+        display = vim.fn.fnamemodify(directory, ":h:t") .. "/" .. vim.fn.fnamemodify(directory, ":t"),
+        ordinal = vim.fn.fnamemodify(directory, ":h:t") .. "/" .. vim.fn.fnamemodify(directory, ":t"),
       })
     end
   end

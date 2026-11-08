@@ -18,11 +18,25 @@ build-commands:
   - |
     install -Dm755 /dev/stdin /app/bin/lua-language-server <<'WRAPPER'
     #!/bin/sh
-    # lua_ls defaults LOGPATH to <install>/log, but /app is read-only at
-    # runtime; predefine the global via -e (evaluated by bin/main.lua before
-    # main.lua runs) so logs + cache land in the user's cache dir instead.
-    # METAPATH stays under /app: it is only read.
-    exec /app/share/lua-language-server/bin/lua-language-server \
-      -e "LOGPATH=(os.getenv('LOGPATH') or ((os.getenv('XDG_CACHE_HOME') or (os.getenv('HOME') .. '/.cache')) .. '/lua-language-server'))" \
-      -E /app/share/lua-language-server/main.lua "$@"
+    # LLS writes into its install dir by default; /app is read-only at
+    # runtime. Two writes must be redirected (globals predefined via -e,
+    # evaluated by bin/main.lua before main.lua runs):
+    #  - LOGPATH: per-run logs + analysis cache.
+    #  - METAPATH: on first start LLS compiles meta/template into
+    #    meta/<runtime> <locale> <encoding>/ and the VM later loads those
+    #    files FROM DISK, so a read-only METAPATH silently kills the
+    #    builtin library ("string" etc. undefined). The writable meta/ is
+    #    seeded with symlinks to the read-only shipped inputs (template,
+    #    3rd, ...); LLS generates per-locale runtime dirs inside it.
+    APP=/app/share/lua-language-server
+    CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/lua-language-server"
+    META="$CACHE/meta"
+    mkdir -p "$META"
+    for d in "$APP"/meta/*; do
+      ln -sfn "$d" "$META/$(basename "$d")"
+    done
+    exec "$APP/bin/lua-language-server" \
+      -e "LOGPATH=[==[$CACHE]==]" \
+      -e "METAPATH=[==[$META]==]" \
+      -E "$APP/main.lua" "$@"
     WRAPPER

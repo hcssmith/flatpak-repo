@@ -1,0 +1,3 @@
+name: nvim-lsp
+modules:
+  - lsp/lua_ls.yml

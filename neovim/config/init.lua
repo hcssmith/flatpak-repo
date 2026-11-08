@@ -77,4 +77,5 @@ require('statusline')
 --require('tabline')
 require('ui')
 require('buffers')
+require('lsp')
 

@@ -19,6 +19,7 @@ modules:
   - neovim/neovim-source.yml
   - neovim/config.yml
   - neovim/plugins.yml
+  - neovim/lsp.yml
 
   - bin/ripgrep/ripgrep.yml
 

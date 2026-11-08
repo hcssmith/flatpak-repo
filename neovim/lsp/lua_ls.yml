@@ -18,6 +18,11 @@ build-commands:
   - |
     install -Dm755 /dev/stdin /app/bin/lua-language-server <<'WRAPPER'
     #!/bin/sh
+    # lua_ls defaults LOGPATH to <install>/log, but /app is read-only at
+    # runtime; predefine the global via -e (evaluated by bin/main.lua before
+    # main.lua runs) so logs + cache land in the user's cache dir instead.
+    # METAPATH stays under /app: it is only read.
     exec /app/share/lua-language-server/bin/lua-language-server \
+      -e "LOGPATH=(os.getenv('LOGPATH') or ((os.getenv('XDG_CACHE_HOME') or (os.getenv('HOME') .. '/.cache')) .. '/lua-language-server'))" \
       -E /app/share/lua-language-server/main.lua "$@"
     WRAPPER

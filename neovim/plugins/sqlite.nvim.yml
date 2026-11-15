@@ -1,0 +1,9 @@
+name: sqlite.nvim
+buildsystem: simple
+sources:
+  - type: git
+    url: https://github.com/3rd/sqlite.nvim
+    branch: master
+build-commands:
+  - mkdir -p /app/share/site/pack/plugins/start/sqlite.nvim
+  - cp -a . /app/share/site/pack/plugins/start/sqlite.nvim

@@ -1,0 +1,18 @@
+name: lsqlite3
+buildsystem: cmake-ninja
+config-opts:
+  - -DCMAKE_BUILD_TYPE=Release
+  # -DluaL_reg: the 2013-era source uses Lua 5.0's deprecated alias for
+  # luaL_Reg, which luajit's headers no longer define.
+  - -DCMAKE_C_FLAGS=-I/app/include/luajit-2.1 -DluaL_reg=luaL_Reg
+sources:
+  # LuaDist's own CMakeLists.txt pulls in their cmake/ framework, which
+  # targets CMake 2.8 and doesn't parse under the SDK's CMake 4; the
+  # patch file replaces it with a minimal one (lpeg approach). Needs
+  # bin/sqlite.yml built first (pkg-config finds /app's sqlite3).
+  - type: git
+    url: https://github.com/LuaDist/lsqlite3
+    commit: 78d148c21f4105592a0ba429b27886d732579dd4
+  - type: file
+    path: ../patches/lsqlite3/CMakeLists.txt
+    dest-filename: CMakeLists.txt

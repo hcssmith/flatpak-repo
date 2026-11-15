@@ -1,0 +1,5 @@
+name: search
+modules:
+  - ../bin/tcl.yml
+  - ../bin/sqlite.yml
+  - ../lib/lsqlite3.yml

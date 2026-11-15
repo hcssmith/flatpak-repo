@@ -1,0 +1,19 @@
+name: tcl
+buildsystem: autotools
+# The autotools build (configure, Makefile.in) lives in unix/, not the
+# top of the tree.
+subdir: unix
+config-opts:
+  # zipfs appends the script library (init.tcl et al.) as a zip to the
+  # end of libtcl9.1.so; flatpak-builder's debug-strip truncates the
+  # ELF and the zip with it, leaving a tclsh that can't find init.tcl.
+  # Install the library as plain files instead.
+  - --disable-zipfs
+post-install:
+  # Only the versioned tclsh9.1 is installed; sqlite's configure looks
+  # for plain tclsh.
+  - ln -s tclsh9.1 /app/bin/tclsh
+sources:
+  - type: git
+    url: https://github.com/tcltk/tcl
+    tag: core-9-1-0

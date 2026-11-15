@@ -23,6 +23,10 @@ modules:
 
   - bin/ripgrep/ripgrep.yml
 
+  # SQLite for nvim's Lua: the search group builds tcl (build-only,
+  # sqlite's codegen), sqlite itself and the lsqlite3 Lua module.
+  - neovim/search.yml
+
   # Clipboard providers: nvim picks wl-clipboard on wayland sessions and
   # xclip on X11/XWayland automatically ($WAYLAND_DISPLAY / $DISPLAY).
   # libXmu is xclip's build dependency and must come before it.
@@ -38,6 +42,10 @@ modules:
         install -Dm755 /dev/stdin /app/bin/nvim <<'WRAPPER'
         #!/bin/sh
         export XDG_CONFIG_HOME=/app/etc
+        # luajit's compiled-in package.cpath is /usr/local-based (PREFIX
+        # only applies to make install); point require() at /app's Lua
+        # C modules, ";;" keeps the default as fallback.
+        export LUA_CPATH="/app/lib/lua/5.1/?.so;;"
         exec /app/bin/nvim.bin "$@"
         WRAPPER
 
@@ -58,6 +66,12 @@ cleanup:
   - /lib/libXmuu.so*
   # Standalone luajit interpreter: only used at build time (LUA_PRG).
   - /bin/luajit*
+  # tcl exists only as sqlite's build-time codegen tool.
+  - /bin/tclsh*
+  - /lib/libtcl9.1.so*
+  - /lib/tcl9.1
+  - /lib/tclConfig.sh
+  - /lib/tclooConfig.sh
   - /share/man
   - /share/doc
 

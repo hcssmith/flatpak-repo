@@ -7,4 +7,5 @@ modules:
   - plugins/nui.nvim.yml
   - plugins/noice.nvim.yml
   - plugins/nvim-web-devicons.nvim.yml
+  - plugins/sqlite.nvim.yml
 

@@ -1,0 +1,11 @@
+name: sqlite
+config-opts:
+  # tclsh is still needed to generate the amalgamation, but the Tcl
+  # extension (tclsqlite.c) in this release doesn't compile against
+  # Tcl 9's Tcl_Size API.
+  - --disable-tcl
+sources:
+  - type: git
+    url: https://github.com/sqlite/sqlite
+    tag: version-3.45.1
+
